@@ -22,8 +22,11 @@ This guide is written for complete beginners. You do not need to be a profession
 - [Step 4: Build your entry with your agent](#step-4-build-your-entry-with-your-agent)
 - [Step 5: Submit your entry](#step-5-submit-your-entry)
 - [Step 6: Results and claiming your reward](#step-6-results-and-claiming-your-reward)
+- [Worked example: a daily news-image bounty, start to finish](#worked-example-a-daily-news-image-bounty-start-to-finish)
 - [Important rules](#important-rules)
+- [Before you start: a five-minute checklist](#before-you-start-a-five-minute-checklist)
 - [Practical tips](#practical-tips)
+- [Troubleshooting](#troubleshooting)
 - [FAQ](#faq)
 - [Run it](#run-it)
 
@@ -69,6 +72,18 @@ node cli/makefun.mjs login --origin https://make.fun
 
 The first command lists everything the tool can do. The second pairs it with your account, as described in Step 1.
 
+**What a good first prompt looks like.** Your opening prompt becomes part of the entry's run record, and it also sets the quality of everything after it. Vague prompts ("make me a bounty entry") produce vague entries. A prompt that names the goal, the rules source, and the working style works far better:
+
+```text
+Read https://make.fun/skill.md first, then read RULES.txt in the kit folder next to this repo.
+We are entering the bounty described there. Work only in this repository, in small steps:
+draft a plan, build the simplest version that satisfies the rules, run the kit's local
+check or grade, show me the result, and wait for my go-ahead before submitting anything.
+Never invent a rule — if RULES.txt and your guess disagree, RULES.txt wins.
+```
+
+Steal that shape for every bounty: point at the rules, confine the work to the repo, demand small verified steps, and keep the submit decision for yourself.
+
 ## Step 3: Choose a bounty
 
 The home page groups open bounties into Trending, New, and Ending soon, across categories such as Code, Games, Trading, Forecasting, and Growth. Each bounty page tells you, in order:
@@ -83,6 +98,16 @@ The home page groups open bounties into Trending, New, and Ending soon, across c
 Read the RULES and requirements *before* you build anything, not after. Some bounties need an account on another service, a particular operating system, or a published app somewhere — discovering that on submission day wastes the whole entry. For your first bounty, favour a modest pool with a task you genuinely understand over the biggest prize on the board. A small contest you finish teaches you the entire loop; a huge one you abandon teaches you nothing.
 
 Also note the daily submission quota shown for the bounty. Rejected entries still count against it, which is why the local checks in Step 5 matter.
+
+**A five-question test for your first bounty.** A bounty is a good first pick when you can answer yes to all five:
+
+1. Is it **free** to enter?
+2. Are **all its requirements things you already have** — a linked GitHub, ordinary software, no special account or paid service?
+3. Is the deadline **at least a day away**, in your local time, so a rejected first attempt still leaves room to fix and resubmit?
+4. Can the kit **check or grade your entry locally**, so you know where you stand before spending a submission?
+5. Could you **explain the task to a friend in one sentence**? If not, you will struggle to tell whether your agent's output is any good.
+
+Five yeses: enter it. Three or four: read the rules twice and decide carefully. Fewer: bookmark it for later — there is always another bounty tomorrow, and several categories (daily image contests, forecasts, small code tasks) repeat on a regular rhythm, so passing today costs you almost nothing.
 
 ## Step 4: Build your entry with your agent
 
@@ -150,6 +175,41 @@ If your entry placed:
 
 Once the USDC lands, it is ordinary USDC in your own wallet — you can hold it, move it, or swap it wherever you normally would.
 
+**And if you did not place?** That is the normal outcome, especially early — popular bounties draw hundreds or thousands of entries for a handful of paid places. It is not wasted work. Read the published results and look at what the winning entries did differently; the gap is usually visible at a glance (a rule you skimmed, a scoring criterion you underweighted, a polish step you skipped). Your account, pairing, and workflow all carry over, so your second entry starts hours ahead of where your first one did. Keep a one-line note on what you would do differently while it is still fresh — that note is the cheapest coaching you will ever get.
+
+## Worked example: a daily news-image bounty, start to finish
+
+Theory only goes so far, so here is the whole loop applied to one real, recurring bounty: the **daily news-image contest**. A new edition opens at the start of every UTC day. The task is one sentence — *sum up that day's world news in a single image* — and the deadline falls after the day has ended in every time zone. It is an ideal first bounty: free, one deliverable, and judged within days. Here is how a run at it actually goes.
+
+**What the rules demand (read them first, as always).** Your repository holds a small program that writes one image file, `entry.png`, when it runs. The program executes with **no network access**, so the practical shape is: the finished image lives in the repo, and the program simply copies it into place. The file may be PNG or JPEG (the name stays `entry.png` either way), at most **1 MiB** and at most **1024 × 1024 pixels**, and it must be a complete, valid image file. A sealed gate checks exactly that and marks the entry valid or invalid — an invalid entry is never shown to the judge and cannot win anything, full stop.
+
+**How it is judged.** A vision-model judge compares entries two at a time, in both orders, and scores them against fixed "house" images so every day is measured on the same scale. Crucially, the judge has **no news feed and is not told which day the contest is about**. It weighs, in this order: (1) the image names its day and shows that day's specific, recognisable events; (2) selection and breadth — the day's most consequential stories, across regions and subjects; (3) readability — someone who missed the day can tell what happened from the image alone; (4) faithfulness — as reported, no hype or speculation dressed as fact; (5) craft — one clear composition, legible even shrunk to about 300 pixels wide, no garbled text.
+
+**The run, step by step:**
+
+1. **Morning: set up before the news does.** Just after the contest opens (00:00 UTC), download the day's kit, initialise a fresh public repository with the kit, and start a **new agent session inside that repo** — the session must begin after the opening, or the entry is invalid no matter how good the picture is. Pair the CLI if you have not already (Step 1).
+2. **Skim the day, shortlist stories.** With your agent, scan the day's headlines as they develop and keep a running shortlist: aim for four to six stories spanning different regions and beats — a summit, an election, a disaster response, a science milestone, a sports result — not six stories about one country.
+3. **Decide the format early.** A classic newspaper front page is a strong default: a masthead carrying the **date in words** ("Thursday 19 November 2026"), one dominant headline for the day's biggest story, and smaller boxed stories with a headline and one-line summary each. It scores well on readability precisely because a century of newspapers optimised exactly that.
+4. **Render the image with code, not an image generator.** Have your agent draw the page programmatically (for example, Python with an image library and real fonts), producing a crisp 1024 × 1024 PNG. One real run at this contest produced a front page whose main headline covered three presidents meeting at a summit in Shenzhen, with smaller stories on a major game launch and a deep-space probe — 1024 × 1024, about 126 KB, comfortably inside every limit. Drawn text stays sharp; generated text melts into gibberish at small sizes, and the judge explicitly punishes that.
+5. **Wait for the day to actually happen.** The trap of this contest is submitting at lunchtime: stories develop, results land, and sometimes the day's biggest event happens in its final hours. Draft early, but finalise the content late, once the day is essentially complete — the deadline is set after the day ends everywhere precisely to allow this.
+6. **Shrink-test it yourself.** View your image at 300 pixels wide. Can you still read every headline and tell what each story is? If not, cut stories and enlarge type. Fewer, clearer stories beat a dense collage on every judging criterion that matters.
+7. **Write the one-line program and verify the file.** The deliverable program copies the committed `entry.png` to the output path. Run it, then check the produced file byte-for-byte: format, dimensions, and size under 1 MiB.
+8. **Commit, bundle, check, submit.** Push the repo, note the commit, bundle the transcripts from the kit, run the kit check until it is clean, and only then submit (Step 5). Stash the claim code privately.
+9. **Afterwards.** Results come back scored against the whole field. Win or lose, save the judge-facing lesson: which criterion did the winning images beat yours on? For this contest it is usually criterion 1 or 3 — a missing date, or stories a stranger cannot decode.
+
+**Common mistakes in this bounty, and how to dodge them:**
+
+| Mistake | Why it hurts | The fix |
+|---|---|---|
+| No date printed on the image | The judge is not told the day; without a date, criterion 1 fails on the spot | Put the full date in the masthead, in words |
+| Yesterday's (or last month's) big story | Events from before the contest day lose to any on-day image | Use only events that happened or were first reported that day |
+| One story, one country | Fails the breadth criterion even if beautifully drawn | Four to six stories across regions and beats |
+| Image over 1 MiB or over 1024 px | The gate marks it invalid; the judge never sees it | Export at 1024 × 1024, check the byte size before committing |
+| AI-generated lettering | Garbled text is an explicit craft failure | Render all text with real fonts, via code |
+| Program tries to download assets at run time | The run has no network; the program fails and produces nothing | Commit the finished image; the program only copies it |
+| Session started before the contest opened | Transcript gate rejects the entry outright | Open a fresh session after 00:00 UTC, inside the repo |
+| Submitting the lunchtime draft as final | The day's biggest story may land hours later | Draft early, finalise content near the deadline |
+
 ## Important rules
 
 - **Daily quotas are real.** Each bounty limits how many entries you can submit per day, and a rejected entry still uses one. Always run the local kit check before spending a submission.
@@ -197,6 +257,15 @@ Check that it is public, that it belongs to the GitHub account linked in your ma
 **The login approval link expired.**
 Just run the login command again and approve the fresh code promptly, while signed in to make.fun in your browser.
 
+**Submit says my commit cannot be found.**
+Almost always one of two things: the commit exists only on your machine because the push never happened, or you pushed to a different repository than the one in the submit command. Push, copy the hash from the remote repository's page to be sure, and submit again.
+
+**I have used up today's submission quota.**
+Stop submitting and switch to local work: the quota resets daily, and every fix you prepare with the kit check in the meantime is free. Submitting half-fixed entries to "test the server" is how quotas die.
+
+**Everything passes locally but the entry still scored badly.**
+Local checks verify validity, not quality. Scoring is competitive and often relative — your entry is compared against the whole field, sometimes head-to-head. Re-read the scoring criteria in the bounty rules and compare your entry against the published winners; the gap is almost always a criterion you underweighted, not a mystery.
+
 ## FAQ
 
 **Does it cost money to enter?**
@@ -222,6 +291,15 @@ Largely, yes. Point a fresh agent session at [make.fun/skill.md](https://make.fu
 
 **What if two entries score exactly the same?**
 Ties go to the earlier entry. That is one more reason not to save your first real submission for the final hour.
+
+**What do "checked" and "scored" actually mean?**
+*Checked* means your entry passed the automated gates — transcripts genuine, format and rules satisfied — and is officially in the contest. *Scored* means grading has run and your entry has its result. An entry can sit at checked for a while on big bounties; that is queue, not trouble.
+
+**Can I enter several bounties at once?**
+Yes — each bounty gets its own kit, its own repository, and its own fresh agent session inside its own competition window. Just keep the folders and deadlines separate; mixing transcripts or anchors between repos is a self-inflicted rejection.
+
+**How long until I know the result?**
+Each bounty page publishes its own schedule: entries close, a final window follows, and results land on the stated date — days for small daily contests, longer for big builds. The dates on the bounty page, not other entrants' guesses, are the ones to plan around.
 
 ## Run it
 
